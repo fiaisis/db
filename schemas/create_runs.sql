@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS instruments;
 -- Create the table that contains all instrument specific data
 CREATE TABLE IF NOT EXISTS instruments (
     id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    instrument_name VARCHAR
+    instrument_name VARCHAR UNIQUE
 );
 
 -- Create the table that contains all our requested runs

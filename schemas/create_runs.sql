@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS reductions;
 DROP TYPE IF EXISTS state;
 DROP TABLE IF EXISTS scripts;
 DROP TABLE IF EXISTS runs;
+DROP TABLE IF EXISTS instruments;
 
 -- Create the table that contains all instrument specific data
 CREATE TABLE IF NOT EXISTS instruments (

@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS instruments (
 CREATE TABLE IF NOT EXISTS runs (
     id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     filename VARCHAR,
-    instrument INT REFERENCES instruments(id),
+    instrument_id INT REFERENCES instruments(id),
     title VARCHAR,
     users VARCHAR,
     experiment_number INT,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS scripts (
 -- Create the state enum but only if not already made
 DO $$ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'state') THEN
-        CREATE TYPE state AS ENUM ('Successful', 'Unsuccessful', 'Error', 'NotStarted');
+        CREATE TYPE state AS ENUM ('SUCCESSFUL', 'UNSUCCESSFUL', 'ERROR', 'NOT_STARTED');
     END IF;
 END $$;
 
@@ -46,12 +46,12 @@ CREATE TABLE IF NOT EXISTS reductions (
     reduction_state state,
     reduction_status_message VARCHAR,
     reduction_inputs jsonb,
-    script INT REFERENCES scripts(id),
+    script_id INT REFERENCES scripts(id),
     reduction_outputs VARCHAR
 );
 
 -- This table ties each reduction to a respective run, it is a 1 run to many reduction relationship
 CREATE TABLE IF NOT EXISTS runs_reductions (
-    run INT REFERENCES runs(id),
-    reduction INT REFERENCES reductions(id)
+    run_id INT REFERENCES runs(id),
+    reduction_id INT REFERENCES reductions(id)
 );

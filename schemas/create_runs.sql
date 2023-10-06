@@ -55,3 +55,10 @@ CREATE TABLE IF NOT EXISTS runs_reductions (
     run_id INT REFERENCES runs(id),
     reduction_id INT REFERENCES reductions(id)
 );
+
+-- Migration 1
+ALTER TABLE instruments DROP COLUMN latest_run;
+ALTER TABLE instruments ADD latest_run VARCHAR;
+
+-- Migration 2
+ALTER TABLE scripts ADD sha VARCHAR;

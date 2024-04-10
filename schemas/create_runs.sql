@@ -62,3 +62,8 @@ ALTER TABLE instruments ADD latest_run VARCHAR;
 
 -- Migration 2
 ALTER TABLE scripts ADD sha VARCHAR;
+
+-- Migration 3
+ALTER TABLE scripts ADD script_hash VARCHAR UNIQUE;
+ALTER TABLE scripts DROP CONSTRAINT scripts_script_key;
+ALTER TABLE reductions ALTER COLUMN reduction_state SET NOT NULL;

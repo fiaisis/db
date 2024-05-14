@@ -67,3 +67,6 @@ ALTER TABLE scripts ADD sha VARCHAR;
 ALTER TABLE scripts ADD script_hash VARCHAR UNIQUE;
 ALTER TABLE scripts DROP CONSTRAINT scripts_script_key;
 ALTER TABLE reductions ALTER COLUMN reduction_state SET NOT NULL;
+
+-- Migration 4
+ALTER TABLE reductions ADD reduction_stack_trace VARCHAR;

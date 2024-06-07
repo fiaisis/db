@@ -69,10 +69,7 @@ ALTER TABLE scripts DROP CONSTRAINT scripts_script_key;
 ALTER TABLE reductions ALTER COLUMN reduction_state SET NOT NULL;
 
 -- Migration 4
-ALTER TABLE reductions ADD reduction_stack_trace VARCHAR;
-
--- Migration 5
 ALTER TABLE reductions ADD stacktrace VARCHAR;
 
--- Migration 6
+-- Migration 5
 ALTER TABLE reductions ADD runner_image VARCHAR;

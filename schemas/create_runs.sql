@@ -73,3 +73,9 @@ ALTER TABLE reductions ADD stacktrace VARCHAR;
 
 -- Migration 5
 ALTER TABLE reductions ADD runner_image VARCHAR;
+
+-- Migration 6
+CREATE TABLE IF NOT EXISTS staff (
+    id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    user_number INT NOT NULL
+)

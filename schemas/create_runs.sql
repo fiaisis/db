@@ -78,4 +78,47 @@ ALTER TABLE reductions ADD runner_image VARCHAR;
 CREATE TABLE IF NOT EXISTS staff (
     id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     user_number INT NOT NULL
-)
+);
+
+-- Migration 7
+CREATE TABLE IF NOT EXISTS job_owners (
+    id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    experiment_number INT UNIQUE,
+    user_number INT UNIQUE
+);
+INSERT INTO job_owners(experiment_number) SELECT DISTINCT experiment_number FROM runs;
+ALTER TABLE runs ADD owner_id INT REFERENCES job_owners(id);
+UPDATE runs SET owner_id = job_owners.id FROM job_owners WHERE runs.experiment_number = job_owners.experiment_number;
+ALTER TABLE runs DROP experiment_number;
+ALTER TABLE reductions ADD owner_id INT REFERENCES job_owners(id);
+UPDATE reductions SET owner_id = big.o_id FROM (SELECT reductions.id AS r_id, runs.owner_id AS o_id FROM runs INNER JOIN runs_reductions ON runs.id = runs_reductions.run_id INNER JOIN reductions ON runs_reductions.reduction_id = reductions.id) as big WHERE reductions.id = big.r_id;
+ALTER TABLE reductions ADD instrument_id INT REFERENCES instruments(id);
+UPDATE reductions SET instrument_id = big.i_id FROM (SELECT reductions.id AS r_id, runs.instrument_id AS i_id FROM runs INNER JOIN runs_reductions ON runs.id = runs_reductions.run_id INNER JOIN reductions ON runs_reductions.reduction_id = reductions.id) as big WHERE reductions.id = big.r_id;
+ALTER TABLE reductions RENAME TO jobs;
+ALTER TABLE jobs RENAME COLUMN reduction_start TO start;
+ALTER TABLE jobs RENAME COLUMN reduction_end TO "end";
+ALTER TABLE jobs RENAME COLUMN reduction_state TO state;
+ALTER TABLE jobs RENAME COLUMN reduction_status_message TO status_message;
+ALTER TABLE jobs RENAME COLUMN reduction_inputs TO inputs;
+ALTER TABLE jobs RENAME COLUMN reduction_outputs TO outputs;
+
+-- Undo Migration 7
+
+-- Undo renames
+ALTER TABLE jobs RENAME COLUMN start TO reduction_start;
+ALTER TABLE jobs RENAME COLUMN "end" TO reduction_end;
+ALTER TABLE jobs RENAME COLUMN state TO reduction_state;
+ALTER TABLE jobs RENAME COLUMN status_message TO reduction_status_message;
+ALTER TABLE jobs RENAME COLUMN inputs TO reduction_inputs;
+ALTER TABLE jobs RENAME COLUMN outputs TO reduction_outputs;
+ALTER TABLE jobs RENAME TO reductions;
+
+-- Clean up runs
+ALTER TABLE runs ADD experiment_number INT;
+UPDATE runs SET experiment_number = job_owners.experiment_number FROM job_owners WHERE runs.owner_id = job_owners.id;
+ALTER TABLE runs DROP owner_id;
+
+-- Clean up reductions and drop job_owners
+ALTER TABLE reductions DROP instrument_id;
+ALTER TABLE reductions DROP owner_id;
+DROP TABLE job_owners;

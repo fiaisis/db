@@ -4,8 +4,8 @@ from typing import Any
 from sqlalchemy import NullPool, create_engine
 from sqlalchemy.orm import sessionmaker
 
-from db.data_models import Instrument, Job, Run, Script, State, JobOwner, JobType, run_job_junction_table
-from db.utils import DatabaseInconsistency
+from db.db.data_models import Instrument, Job, Run, Script, State, JobOwner, JobType, run_job_junction_table
+from db.db.utils import DatabaseInconsistency
 
 
 def create_hash_of_script(script: str) -> str:

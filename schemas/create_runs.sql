@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS staff (
 
 -- Migration 7
 DO $$ BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'state') THEN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'job_type') THEN
         CREATE TYPE job_type AS ENUM ('RERUN', 'SIMPLE', 'AUTOREDUCTION');
     END IF;
 END $$;
@@ -107,6 +107,8 @@ ALTER TABLE jobs RENAME COLUMN reduction_status_message TO status_message;
 ALTER TABLE jobs RENAME COLUMN reduction_inputs TO inputs;
 ALTER TABLE jobs RENAME COLUMN reduction_outputs TO outputs;
 ALTER TABLE jobs ADD job_type job_type;
+ALTER TABLE runs_reductions RENAME TO runs_jobs;
+ALTER TABLE runs_jobs RENAME COLUMN reduction_id TO job_id;
 
 -- Undo Migration 7
 ALTER TABLE jobs DROP COLUMN job_type;
@@ -124,3 +126,5 @@ ALTER TABLE reductions DROP instrument_id;
 ALTER TABLE reductions DROP owner_id;
 DROP TABLE job_owners;
 DROP TYPE IF EXISTS job_type;
+ALTER TABLE runs_jobs RENAME TO runs_reductions;
+ALTER TABLE runs_reductions RENAME COLUMN job_id TO reduction_id;

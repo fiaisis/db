@@ -1,11 +1,11 @@
 import hashlib
 from typing import Any
 
-from sqlalchemy import NullPool, create_engine, ColumnElement
+from sqlalchemy import NullPool, create_engine
 from sqlalchemy.orm import sessionmaker
 
-from db.data_models import Instrument, Job, Run, Script, State, JobOwner, JobType
-from db.data_models.run_job import run_job_junction_table
+from db.data_models import Instrument, Job, Run, Script, State, JobOwner, JobType, run_job_junction_table
+from db.utils import DatabaseInconsistency
 
 
 def create_hash_of_script(script: str) -> str:
@@ -101,12 +101,26 @@ class DBUpdater:
             session.add(job)
             session.commit()
 
-    def find_run(self, job_id: int) -> Run | None:
+    def add_rerun_job(self, original_job_id: int, new_script: str, new_owner_id: int, new_runner_image: str) -> tuple[Run, Job]:
         with self.session_maker_func() as session:
-            job = session.get(Job, job_id)
-            if job is None:
-                return None
-            return job.runs[0]
+            original_job = session.get(Job, original_job_id)
+            if original_job is None:
+                raise DatabaseInconsistency("Database is not consistent with expected behaviour")
+            # Assume the Many jobs to 1 run is still the expected relationship
+            run = original_job.runs.get(0, None)
+            new_job = Job(
+                state=State.NOT_STARTED,
+                inputs={},
+                script=new_script,
+                runner_image=new_runner_image,
+                run=run,
+                owner_id=new_owner_id,
+                job_type=JobType.RERUN
+            )
+            session.add(new_job)
+            session.commit()
+        return run, new_job
+
 
     def update_script(self, job: Job, job_script: str, script_sha: str) -> None:
         """

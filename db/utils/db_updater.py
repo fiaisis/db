@@ -63,7 +63,7 @@ class DBUpdater:
         """
         This function submits data to the database from what is initially available on detected-runs message broker
         station/topic\
-        :param instrument_name: str
+        :param instrument_name: str, the name of the instrument
         :param run: the run that needs to be reduced
         :param reduction_inputs: The reduction inputs
         :param runner_image: The image to be used by the runner
@@ -100,6 +100,7 @@ class DBUpdater:
             )
             session.add(job)
             session.commit()
+            session.refresh(job)
 
             return job
 

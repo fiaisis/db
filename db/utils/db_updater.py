@@ -84,6 +84,7 @@ class DBUpdater:
                 run.instrument = instrument
             else:
                 run = existing_run
+                owner = run.owner
 
             job = Job(
                 start=None,
@@ -94,11 +95,10 @@ class DBUpdater:
                 outputs=None,
                 runner_image=runner_image,
                 job_type=JobType.AUTOREDUCTION,
+                runs=[run],
                 owner=owner
             )
-            # Now create the run_reduction entry and add it
-            run_reduction = run_job_junction_table(run_relationship=run, job_relationship=job)
-            session.add(run_reduction)
+            session.add(job)
             session.commit()
 
             return job

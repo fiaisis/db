@@ -58,6 +58,7 @@ class DBUpdater:
             run: Run,
             reduction_inputs: dict[str, Any],
             runner_image: str,
+            experiment_number: int
     ) -> Job:
         """
         This function submits data to the database from what is initially available on detected-runs message broker
@@ -66,13 +67,18 @@ class DBUpdater:
         :param run: the run that needs to be reduced
         :param reduction_inputs: The reduction inputs
         :param runner_image: The image to be used by the runner
+        :param experiment_number: The experiment number that the run has defined, used for determining the owner.
         :return: The created Reduction object
         """
         with self.session_maker_func() as session:
             instrument = session.query(Instrument).filter_by(instrument_name=instrument_name).first()
             if instrument is None:
                 instrument = Instrument(instrument_name=instrument_name)
-
+            # Find owner if not already present
+            owner = session.query(JobOwner).filter_by(experiment_number=experiment_number).first()
+            if owner is None:
+                owner = JobOwner(experiment_number=experiment_number)
+            run.owner = owner
             existing_run = session.query(Run).filter_by(filename=run.filename).first()
             if existing_run is None:
                 run.instrument = instrument
@@ -87,7 +93,8 @@ class DBUpdater:
                 script_id=None,
                 outputs=None,
                 runner_image=runner_image,
-                job_type=JobType.AUTOREDUCTION
+                job_type=JobType.AUTOREDUCTION,
+                owner=owner
             )
             # Now create the run_reduction entry and add it
             run_reduction = run_job_junction_table(run_relationship=run, job_relationship=job)

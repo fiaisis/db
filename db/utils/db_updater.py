@@ -121,13 +121,14 @@ class DBUpdater:
                 inputs={},
                 script=new_script,
                 runner_image=new_runner_image,
-                run=run,
+                runs=[run],
                 owner_id=new_owner_id,
                 job_type=JobType.RERUN
             )
             session.add(new_job)
             session.commit()
-        return run, new_job
+            session.refresh(new_job)
+            return run, new_job
 
     def update_script(self, job: Job, job_script: str, script_sha: str) -> None:
         """

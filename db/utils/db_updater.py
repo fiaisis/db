@@ -129,7 +129,6 @@ class DBUpdater:
             session.commit()
         return run, new_job
 
-
     def update_script(self, job: Job, job_script: str, script_sha: str) -> None:
         """
         Updates the script tied to a reduction in the DB
@@ -146,4 +145,37 @@ class DBUpdater:
 
             job.script = script
             session.add(job)
+            session.commit()
+
+    def update_completed_run(
+            self,
+            db_job_id: int,
+            state: State,
+            status_message: str,
+            output_files: list[str],
+            start: str,
+            end: str,
+            stacktrace: str,
+    ) -> None:
+        """
+        This function submits data to the database from what is initially available on completed-runs message broker
+        station/topic
+        :param db_job_id: The ID for the row in the job table
+        :param state: The state of how the run ended
+        :param status_message: The message that accompanies the state for how the  state ended, if the state for
+        example was unsuccessful or an error, it would have the reason/error message.
+        :param output_files: The files output from the reduction job
+        :param start: The time the pod running the reduction started working
+        :param end: The time the pod running the reduction stopped working
+        :param stacktrace: The stacktrace in the event that the db entry failed
+        :return:
+        """
+        with self.session_maker_func() as session:
+            job = session.query(Job).filter_by(id=db_job_id).one()
+            job.state = state
+            job.outputs = str(output_files)
+            job.status_message = status_message
+            job.stacktrace = stacktrace
+            job.start = start  # type: ignore
+            job.end = end  # type: ignore
             session.commit()

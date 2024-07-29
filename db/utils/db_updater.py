@@ -30,8 +30,7 @@ class DBUpdater:
     # pylint: disable=too-many-arguments, too-many-locals
     def find_owner_db_entry_or_create(self, experiment_number: int | None = None, user_number: int | None = None) -> JobOwner:
         """
-        Find the owner db entry or create a new one and return it. Defaults to the user number over the experiment
-        number if one is provided.
+        Find the owner in the db entry or create a new one and return it. Defaults to the user number over the experiment number if both are provided.
         :param experiment_number: int, The experiment number that is unique
         :param user_number: int, the User number for the owner
         :return:
@@ -50,6 +49,7 @@ class DBUpdater:
 
             session.add(owner)
             session.commit()
+            session.refresh(owner)
             return owner
 
     def add_detected_run(
@@ -115,7 +115,7 @@ class DBUpdater:
             if original_job is None:
                 raise DatabaseInconsistency("Database is not consistent with expected behaviour")
             # Assume the Many jobs to 1 run is still the expected relationship
-            run = original_job.runs.get(0, None)
+            run = original_job.runs[0]
             new_job = Job(
                 state=State.NOT_STARTED,
                 inputs={},

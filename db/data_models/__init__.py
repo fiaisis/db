@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import enum
-from datetime import datetime
+import typing
 
 from sqlalchemy import inspect, Enum, ForeignKey, Table, Column, Integer
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+if typing.TYPE_CHECKING:
+    from datetime import datetime
 
 
 class State(enum.Enum):

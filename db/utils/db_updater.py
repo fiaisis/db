@@ -150,6 +150,7 @@ class DBUpdater:
             job.script = script
             session.add(job)
             session.commit()
+            session.refresh(job)
 
     def update_completed_run(
             self,

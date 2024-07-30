@@ -108,6 +108,7 @@ class DBUpdater:
         with self.session_maker_func() as session:
             session.add(job)
             session.commit()
+            session.refresh(job.owner)
 
     def add_rerun_job(self, original_job_id: int, new_script: str, new_owner_id: int, new_runner_image: str) -> tuple[list[Run], Job]:
         with self.session_maker_func() as session:

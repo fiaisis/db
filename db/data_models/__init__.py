@@ -51,8 +51,7 @@ class Base(DeclarativeBase):
             return False
         # Ignores due to inspect returning Any, includes None, by default
         return {attr.key: getattr(self, attr.key) for attr in inspect(self).mapper.column_attrs} == {
-            attr.key: getattr(other, attr.key)
-            for attr in inspect(other).mapper.column_attrs
+            attr.key: getattr(other, attr.key) for attr in inspect(other).mapper.column_attrs
         }
 
 

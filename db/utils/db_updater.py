@@ -109,28 +109,26 @@ class DBUpdater:
             session.add(job)
             session.commit()
 
-    def add_rerun_job(self, original_job_id: int, new_script: str, new_owner_id: int, new_runner_image: str) -> tuple[Run, Job]:
+    def add_rerun_job(self, original_job_id: int, new_script: str, new_owner_id: int, new_runner_image: str) -> tuple[list[Run], Job]:
         with self.session_maker_func() as session:
             original_job = session.get(Job, original_job_id)
             if original_job is None:
                 raise DatabaseInconsistency("Database is not consistent with expected behaviour")
-            # Assume the Many jobs to 1 run is still the expected relationship
-            run = original_job.runs[0]
             new_job = Job(
                 state=State.NOT_STARTED,
                 inputs={},
-                script=new_script,
                 runner_image=new_runner_image,
-                runs=[run],
+                runs=original_job.runs,
                 owner_id=new_owner_id,
                 job_type=JobType.RERUN
             )
+            self.update_script(job=new_job, job_script=new_script, script_sha=None)
             session.add(new_job)
             session.commit()
             session.refresh(new_job)
-            return run, new_job
+            return original_job.runs, new_job
 
-    def update_script(self, job: Job, job_script: str, script_sha: str) -> None:
+    def update_script(self, job: Job, job_script: str, script_sha: str | None) -> None:
         """
         Updates the script tied to a reduction in the DB
         :param job: The reduction to be updated

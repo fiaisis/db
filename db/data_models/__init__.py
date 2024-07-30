@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import enum
 from datetime import datetime
-from typing import Self
 
 from sqlalchemy import inspect, Enum, ForeignKey, Table, Column, Integer
 from sqlalchemy.dialects.postgresql import JSONB
@@ -124,7 +123,7 @@ class Instrument(Base):  # type: ignore[valid-type, misc]
     latest_run: Mapped[str] = mapped_column()
     specification: Mapped[str] = mapped_column()
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, Instrument):
             return bool(self.instrument_name == other.instrument_name and self.latest_run == other.latest_run)
         return False
@@ -156,7 +155,7 @@ class Run(Base):
         lazy="subquery",
     )
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, Run):
             return (
                 self.filename == other.filename

@@ -5,7 +5,7 @@ from sqlalchemy import NullPool, create_engine
 from sqlalchemy.orm import sessionmaker
 
 from db.data_models import Instrument, Job, Run, Script, State, JobOwner, JobType, run_job_junction_table
-from db.utils import DatabaseInconsistency
+from db.utils import DatabaseInconsistencyError
 
 
 def create_hash_of_script(script: str) -> str:
@@ -30,7 +30,8 @@ class DBUpdater:
     # pylint: disable=too-many-arguments, too-many-locals
     def find_owner_db_entry_or_create(self, experiment_number: int | None = None, user_number: int | None = None) -> JobOwner:
         """
-        Find the owner in the db entry or create a new one and return it. Defaults to the user number over the experiment number if both are provided.
+        Find the owner in the db entry or create a new one and return it. Defaults to the user number over the
+        experiment number if both are provided.
         :param experiment_number: int, The experiment number that is unique
         :param user_number: int, the User number for the owner
         :return:
@@ -114,7 +115,7 @@ class DBUpdater:
         with self.session_maker_func() as session:
             original_job = session.get(Job, original_job_id)
             if original_job is None:
-                raise DatabaseInconsistency("Database is not consistent with expected behaviour")
+                raise DatabaseInconsistencyError("Database is not consistent with expected behaviour")
             new_job = Job(
                 state=State.NOT_STARTED,
                 inputs={},

@@ -122,7 +122,11 @@ class DBUpdater:
                 owner_id=new_owner_id,
                 job_type=JobType.RERUN
             )
-            self.update_script(job=new_job, job_script=new_script, script_sha=None)
+            script_hash = create_hash_of_script(new_script)
+            script = session.query(Script).filter_by(script_hash=script_hash).first()
+            if script is None:
+                script = Script(script=new_script, sha=None, script_hash=script_hash)
+            new_job.script = script
             session.add(new_job)
             session.commit()
             session.refresh(new_job)

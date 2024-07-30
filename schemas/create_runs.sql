@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS runs_reductions;
 DROP TABLE IF EXISTS reductions;
-DROP TYPE IF EXISTS state;
+DROP TYPE IF EXISTS job_type;
 DROP TABLE IF EXISTS scripts;
 DROP TABLE IF EXISTS runs;
 DROP TABLE IF EXISTS instruments;
@@ -81,6 +81,11 @@ CREATE TABLE IF NOT EXISTS staff (
 );
 
 -- Migration 7
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'job_type') THEN
+        CREATE TYPE job_type AS ENUM ('RERUN', 'SIMPLE', 'AUTOREDUCTION');
+    END IF;
+END $$;
 CREATE TABLE IF NOT EXISTS job_owners (
     id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     experiment_number INT UNIQUE,
@@ -101,8 +106,12 @@ ALTER TABLE jobs RENAME COLUMN reduction_state TO state;
 ALTER TABLE jobs RENAME COLUMN reduction_status_message TO status_message;
 ALTER TABLE jobs RENAME COLUMN reduction_inputs TO inputs;
 ALTER TABLE jobs RENAME COLUMN reduction_outputs TO outputs;
+ALTER TABLE jobs ADD job_type job_type;
+ALTER TABLE runs_reductions RENAME TO runs_jobs;
+ALTER TABLE runs_jobs RENAME COLUMN reduction_id TO job_id;
 
 -- Undo Migration 7
+ALTER TABLE jobs DROP COLUMN job_type;
 ALTER TABLE jobs RENAME COLUMN start TO reduction_start;
 ALTER TABLE jobs RENAME COLUMN "end" TO reduction_end;
 ALTER TABLE jobs RENAME COLUMN state TO reduction_state;
@@ -116,3 +125,6 @@ ALTER TABLE runs DROP owner_id;
 ALTER TABLE reductions DROP instrument_id;
 ALTER TABLE reductions DROP owner_id;
 DROP TABLE job_owners;
+DROP TYPE IF EXISTS job_type;
+ALTER TABLE runs_jobs RENAME TO runs_reductions;
+ALTER TABLE runs_reductions RENAME COLUMN job_id TO reduction_id;

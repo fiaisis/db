@@ -1,14 +1,11 @@
 from __future__ import annotations
 
 import enum
-import typing
+from datetime import datetime  # type: ignore
 
 from sqlalchemy import Column, Enum, ForeignKey, Integer, Table, inspect
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-
-if typing.TYPE_CHECKING:
-    from datetime import datetime
 
 
 class State(enum.Enum):

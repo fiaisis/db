@@ -121,8 +121,8 @@ class Instrument(Base):
 
     __tablename__ = "instruments"
     instrument_name: Mapped[str] = mapped_column(unique=True)
-    latest_run: Mapped[str] = mapped_column()
-    specification: Mapped[JSONB] = mapped_column(JSONB)
+    latest_run: Mapped[str | None] = mapped_column()
+    specification: Mapped[JSONB | None] = mapped_column(JSONB)
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, Instrument):

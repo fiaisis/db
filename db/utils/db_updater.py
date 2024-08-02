@@ -98,7 +98,7 @@ class DBUpdater:
                 outputs=None,
                 runner_image=runner_image,
                 job_type=JobType.AUTOREDUCTION,
-                runs=[run],
+                run=run,
                 owner=owner,
             )
             session.add(job)
@@ -124,7 +124,7 @@ class DBUpdater:
                 state=State.NOT_STARTED,
                 inputs={},
                 runner_image=new_runner_image,
-                runs=original_job.runs,
+                run=original_job.run,
                 owner_id=new_owner_id,
                 job_type=JobType.RERUN,
             )
@@ -136,7 +136,7 @@ class DBUpdater:
             session.add(new_job)
             session.commit()
             session.refresh(new_job)
-            return original_job.runs, new_job
+            return original_job.run, new_job
 
     def update_script(self, job: Job, job_script: str, script_sha: str | None) -> None:
         """

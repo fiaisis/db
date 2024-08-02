@@ -128,3 +128,16 @@ DROP TABLE job_owners;
 DROP TYPE IF EXISTS job_type;
 ALTER TABLE runs_jobs RENAME TO runs_reductions;
 ALTER TABLE runs_reductions RENAME COLUMN job_id TO reduction_id;
+
+-- Migration 8
+ALTER TABLE jobs ADD run_id INT REFERENCES runs(id);
+UPDATE jobs SET run_id = runs_jobs.run_id FROM (SELECT * FROM runs_jobs) as runs_jobs WHERE jobs.id = runs_jobs.job_id;
+DROP TABLE IF EXISTS runs_jobs;
+
+-- Undo Migration 8
+CREATE TABLE IF NOT EXISTS runs_jobs (
+    run_id INT REFERENCES runs(id),
+    job_id INT REFERENCES jobs(id)
+);
+INSERT INTO runs_jobs(run_id, job_id) SELECT run_id, id FROM jobs;
+ALTER TABLE jobs DROP run_id;

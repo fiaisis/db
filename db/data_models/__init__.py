@@ -3,7 +3,7 @@ from __future__ import annotations
 import enum
 from datetime import datetime  # type: ignore
 
-from sqlalchemy import Column, Enum, ForeignKey, Integer, Table, inspect
+from sqlalchemy import Enum, ForeignKey, Integer, inspect
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -52,14 +52,6 @@ class Base(DeclarativeBase):
         }
 
 
-run_job_junction_table = Table(
-    "runs_jobs",
-    Base.metadata,
-    Column("run_id", ForeignKey("runs.id")),
-    Column("job_id", ForeignKey("jobs.id")),
-)
-
-
 class Script(Base):
     """
     The Script class represents a script in the database.
@@ -101,11 +93,8 @@ class Job(Base):
     instrument_id: Mapped[int] = mapped_column(ForeignKey("instruments.id"))
     instrument: Mapped[Instrument] = relationship("Instrument", lazy="joined")
     job_type: Mapped[JobType] = mapped_column(Enum(JobType))
-    runs: Mapped[list[Run]] = relationship(
-        secondary=run_job_junction_table,
-        back_populates="jobs",
-        lazy="subquery",
-    )
+    run_id: Mapped[int | None] = mapped_column(ForeignKey("runs.id"))
+    run: Mapped[Run | None] = relationship(back_populates="Run", lazy="joined")
 
     def __repr__(self) -> str:
         return (
@@ -150,11 +139,7 @@ class Run(Base):
     raw_frames: Mapped[int] = mapped_column(Integer())
     owner_id: Mapped[int] = mapped_column(ForeignKey("job_owners.id"))
     owner: Mapped[JobOwner | None] = relationship("JobOwner", lazy="joined")
-    jobs: Mapped[list[Job]] = relationship(
-        secondary=run_job_junction_table,
-        back_populates="runs",
-        lazy="subquery",
-    )
+    jobs: Mapped[list[Job] | None] = relationship(back_populates="Job", lazy="joined")
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, Run):

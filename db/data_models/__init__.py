@@ -94,7 +94,7 @@ class Job(Base):
     instrument: Mapped[Instrument] = relationship("Instrument", lazy="joined")
     job_type: Mapped[JobType] = mapped_column(Enum(JobType))
     run_id: Mapped[int | None] = mapped_column(ForeignKey("runs.id"))
-    run: Mapped[Run | None] = relationship(back_populates="Run", lazy="joined")
+    run: Mapped[Run | None] = relationship(back_populates="jobs", lazy="joined")
 
     def __repr__(self) -> str:
         return (
@@ -139,7 +139,7 @@ class Run(Base):
     raw_frames: Mapped[int] = mapped_column(Integer())
     owner_id: Mapped[int] = mapped_column(ForeignKey("job_owners.id"))
     owner: Mapped[JobOwner | None] = relationship("JobOwner", lazy="joined")
-    jobs: Mapped[list[Job] | None] = relationship(back_populates="Job", lazy="joined")
+    jobs: Mapped[list[Job] | None] = relationship(back_populates="run", lazy="joined")
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, Run):

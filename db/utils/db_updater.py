@@ -115,7 +115,7 @@ class DBUpdater:
 
     def add_rerun_job(
         self, original_job_id: int, new_script: str, new_owner_id: int, new_runner_image: str
-    ) -> tuple[list[Run], Job]:
+    ) -> tuple[Run, Job]:
         with self.session_maker_func() as session:
             original_job = session.get(Job, original_job_id)
             if original_job is None:

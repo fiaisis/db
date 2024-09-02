@@ -141,3 +141,9 @@ CREATE TABLE IF NOT EXISTS runs_jobs (
 );
 INSERT INTO runs_jobs(run_id, job_id) SELECT run_id, id FROM jobs;
 ALTER TABLE jobs DROP run_id;
+
+-- Migration 9
+ALTER TABLE instrument ADD specification JSONB;
+
+-- Undo Migration 9
+ALTER TABLE instrument DROP specification;

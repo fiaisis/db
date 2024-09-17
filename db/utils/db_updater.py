@@ -100,6 +100,7 @@ class DBUpdater:
                 job_type=JobType.AUTOREDUCTION,
                 run=run,
                 owner=owner,
+                instrument=instrument,
             )
             session.add(job)
             session.commit()

@@ -90,7 +90,7 @@ class Job(Base):
     runner_image: Mapped[str | None] = mapped_column()
     owner_id: Mapped[int] = mapped_column(ForeignKey("job_owners.id"))
     owner: Mapped[JobOwner | None] = relationship("JobOwner", lazy="joined")
-    instrument_id: Mapped[int] = mapped_column(ForeignKey("instruments.id"))
+    instrument_id: Mapped[int | None] = mapped_column(ForeignKey("instruments.id"))
     instrument: Mapped[Instrument] = relationship("Instrument", lazy="joined")
     job_type: Mapped[JobType] = mapped_column(Enum(JobType))
     run_id: Mapped[int | None] = mapped_column(ForeignKey("runs.id"))

@@ -147,3 +147,9 @@ ALTER TABLE instruments ADD specification JSONB;
 
 -- Undo Migration 9
 ALTER TABLE instruments DROP specification;
+
+-- Migration 10
+ALTER TABLE instruments ADD live_data_script VARCHAR;
+
+-- Undo Migration 10
+ALTER TABLE instruments DROP live_data_script;

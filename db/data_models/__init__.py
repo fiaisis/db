@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import enum
-from datetime import datetime  # type: ignore
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 from sqlalchemy import Enum, ForeignKey, Integer, inspect
 from sqlalchemy.dialects.postgresql import JSONB

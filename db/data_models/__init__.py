@@ -4,7 +4,7 @@ import enum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from datetime import datetime  # type: ignore
+    from datetime import datetime
 
 from sqlalchemy import Enum, ForeignKey, Integer, inspect
 from sqlalchemy.dialects.postgresql import JSONB

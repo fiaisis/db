@@ -155,7 +155,7 @@ ALTER TABLE instruments ADD live_data_script VARCHAR;
 ALTER TABLE instruments DROP live_data_script;
 
 -- Migration 11
-ALTER TABLE instruments ADD live_data_support BOOLEAN;
+ALTER TABLE instruments ADD live_data_support BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- Undo Migration 11
 ALTER TABLE instruments DROP live_data_support;

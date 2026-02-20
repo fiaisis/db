@@ -159,3 +159,15 @@ ALTER TABLE instruments ADD live_data_support BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- Undo Migration 11
 ALTER TABLE instruments DROP live_data_support;
+
+-- Migration 12
+ALTER TYPE job_type ADD VALUE 'FAST_START';
+
+-- Undo Migration 12
+ALTER TYPE job_type RENAME TO job_type_old;
+CREATE TYPE job_type AS ENUM ('RERUN', 'SIMPLE', 'AUTOREDUCTION');
+ALTER TABLE jobs
+  ALTER COLUMN job_type
+  TYPE job_type
+  USING job_type::text::job_type;
+DROP TYPE job_type_old;

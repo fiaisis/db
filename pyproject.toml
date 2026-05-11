@@ -25,6 +25,11 @@ test = [
     "pytest-random-order==1.1.1"
 ]
 
+all = [
+    "db[formatting]",
+    "db[test]",
+]
+
 [tool.setuptools]
 packages = ["db", "db.data_models", "db.utils"]
 
